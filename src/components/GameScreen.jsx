@@ -174,12 +174,13 @@ const TargetNumber = styled(motion.div)`
   white-space: nowrap;
 
   @media (max-width: 768px) {
-    top: 70px;
+    top: 20px;
     padding: 8px 20px;
-    font-size: 20px;
+    font-size: 18px;
     box-shadow: 
       0 4px 0 #3AA7A0,
       0 8px 15px rgba(0,0,0,0.15);
+    max-width: 40%;
   }
 
   &::before {
