@@ -28,10 +28,10 @@ const Score = styled(motion.div)`
   position: fixed;
   top: 20px;
   right: 20px;
-  font-size: 32px;
+  font-size: clamp(18px, 4vw, 32px);
   color: white;
   background: linear-gradient(145deg, #FFD93D, #FFE869);
-  padding: 15px 30px;
+  padding: clamp(10px, 2vw, 15px) clamp(15px, 3vw, 30px);
   border-radius: 25px;
   backdrop-filter: blur(8px);
   box-shadow: 
@@ -46,7 +46,13 @@ const Score = styled(motion.div)`
 
   &::before {
     content: '🏆';
-    font-size: 24px;
+    font-size: clamp(16px, 3vw, 24px);
+  }
+
+  @media (max-width: 768px) {
+    top: auto;
+    bottom: 20px;
+    right: 20px;
   }
 `;
 
@@ -54,8 +60,8 @@ const BackButton = styled(motion.button)`
   position: fixed;
   top: 20px;
   left: 20px;
-  padding: 15px 30px;
-  font-size: 24px;
+  padding: clamp(10px, 2vw, 15px) clamp(15px, 3vw, 30px);
+  font-size: clamp(16px, 3vw, 24px);
   border: none;
   border-radius: 25px;
   background: linear-gradient(145deg, #FF6B6B, #ff8585);
@@ -69,6 +75,11 @@ const BackButton = styled(motion.button)`
   transition: all 0.2s;
   z-index: 100;
 
+  @media (max-width: 768px) {
+    padding: 10px 20px;
+    font-size: 18px;
+  }
+
   &:active {
     transform: translateY(4px);
     box-shadow: 
@@ -81,10 +92,10 @@ const Timer = styled(motion.div)`
   position: fixed;
   top: 20px;
   right: 250px;
-  font-size: 36px;
+  font-size: clamp(18px, 4vw, 36px);
   color: white;
   background: linear-gradient(145deg, #FF6B6B, #FF9A8B);
-  padding: 15px 40px;
+  padding: clamp(10px, 2vw, 15px) clamp(15px, 3vw, 40px);
   border-radius: 25px;
   backdrop-filter: blur(8px);
   box-shadow: 
@@ -98,6 +109,18 @@ const Timer = styled(motion.div)`
   gap: 10px;
   transition: all 0.3s ease;
 
+  &::before {
+    content: '⏰';
+    font-size: clamp(16px, 3vw, 24px);
+  }
+
+  @media (max-width: 768px) {
+    top: auto;
+    bottom: 20px;
+    right: auto;
+    left: 20px;
+  }
+
   ${props => props.isLow && `
     color: #FFD93D;
     animation: timerPulse 1s infinite;
@@ -109,11 +132,6 @@ const Timer = styled(motion.div)`
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.1); }
   }
-
-  &::before {
-    content: '⏰';
-    font-size: 24px;
-  }
 `;
 
 const TargetNumber = styled(motion.div)`
@@ -121,10 +139,10 @@ const TargetNumber = styled(motion.div)`
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 36px;
+  font-size: clamp(18px, 4vw, 36px);
   color: white;
   background: linear-gradient(145deg, #4ECDC4, #45E3FF);
-  padding: 20px 40px;
+  padding: clamp(10px, 2vw, 20px) clamp(15px, 3vw, 40px);
   border-radius: 25px;
   backdrop-filter: blur(8px);
   box-shadow: 
@@ -139,7 +157,12 @@ const TargetNumber = styled(motion.div)`
 
   &::before {
     content: '🎯';
-    font-size: 30px;
+    font-size: clamp(20px, 4vw, 30px);
+  }
+
+  @media (max-width: 768px) {
+    width: fit-content;
+    padding: 10px 20px;
   }
 
   &:hover {
@@ -177,21 +200,23 @@ const GameOverModal = styled(motion.div)`
   left: 50%;
   transform: translate(-50%, -50%);
   background: rgba(255,255,255,0.95);
-  padding: 40px 60px;
+  padding: clamp(20px, 4vw, 40px) clamp(30px, 6vw, 60px);
   border-radius: 30px;
   text-align: center;
   z-index: 1000;
   box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+  width: 90%;
+  max-width: 400px;
 
   h2 {
-    font-size: 36px;
+    font-size: clamp(24px, 5vw, 36px);
     color: #FF6B6B;
     margin-bottom: 20px;
     font-family: 'Comic Sans MS', cursive, sans-serif;
   }
 
   p {
-    font-size: 24px;
+    font-size: clamp(18px, 4vw, 24px);
     color: #666;
     font-family: 'Comic Sans MS', cursive, sans-serif;
   }
@@ -200,12 +225,16 @@ const GameOverModal = styled(motion.div)`
 // Add some fun floating elements
 const FloatingEmoji = styled(motion.div)`
   position: fixed;
-  font-size: 40px;
+  font-size: clamp(24px, 5vw, 40px);
   pointer-events: none;
   user-select: none;
   z-index: 1;
   opacity: 0.3;
   filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const GameScreen = ({ level = 'easy', onBackToMenu }) => {

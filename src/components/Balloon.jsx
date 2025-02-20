@@ -15,8 +15,8 @@ const colors = [
 
 const BalloonWrapper = styled(motion.div)`
   position: absolute;
-  width: 85px;
-  height: 100px;
+  width: clamp(50px, 10vw, 85px);
+  height: clamp(60px, 12vw, 100px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,7 +41,7 @@ const BalloonWrapper = styled(motion.div)`
   .number {
     position: relative;
     color: white;
-    font-size: 2.2rem;
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
     font-weight: bold;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
   }
@@ -51,7 +51,7 @@ const BalloonWrapper = styled(motion.div)`
     bottom: -30px;
     left: 50%;
     width: 2px;
-    height: 30px;
+    height: clamp(20px, 4vw, 30px);
     background: linear-gradient(to bottom, white, #ddd);
     transform: translateX(-50%) rotate(${props => props.stringRotation}deg);
     transform-origin: top;
@@ -79,6 +79,12 @@ const BalloonWrapper = styled(motion.div)`
     background: rgba(255,255,255,0.4);
     border-radius: 50%;
     filter: blur(2px);
+  }
+
+  @media (max-width: 768px) {
+    .string {
+      height: 20px;
+    }
   }
 `;
 
