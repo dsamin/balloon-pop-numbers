@@ -18,6 +18,10 @@ const GameWrapper = styled.div`
   height: 100vh;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, #7B68EE, #00BFFF);
 `;
 
 const Score = styled(motion.div)`
@@ -76,7 +80,7 @@ const BackButton = styled(motion.button)`
 const Timer = styled(motion.div)`
   position: fixed;
   top: 20px;
-  right: 150px;
+  right: 200px;
   font-size: 36px;
   color: white;
   background: linear-gradient(145deg, #FF6B6B, #FF9A8B);
@@ -84,24 +88,26 @@ const Timer = styled(motion.div)`
   border-radius: 25px;
   backdrop-filter: blur(8px);
   box-shadow: 
-    0 4px 15px rgba(0,0,0,0.1),
-    inset 0 0 0 1px rgba(255,255,255,0.2);
+    0 8px 0 #FF4F4F,
+    0 15px 20px rgba(0,0,0,0.15);
   font-family: 'Comic Sans MS', cursive, sans-serif;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
   z-index: 100;
   display: flex;
   align-items: center;
   gap: 10px;
+  transition: all 0.3s ease;
 
   ${props => props.isLow && `
     color: #FFD93D;
     animation: timerPulse 1s infinite;
     background: linear-gradient(145deg, #FF4F4F, #FF6B6B);
+    transform: scale(1.1);
   `}
 
   @keyframes timerPulse {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+    50% { transform: scale(1.1); }
   }
 
   &::before {
@@ -194,11 +200,12 @@ const GameOverModal = styled(motion.div)`
 // Add some fun floating elements
 const FloatingEmoji = styled(motion.div)`
   position: fixed;
-  font-size: 30px;
+  font-size: 40px;
   pointer-events: none;
   user-select: none;
   z-index: 1;
-  opacity: 0.5;
+  opacity: 0.3;
+  filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
 `;
 
 const GameScreen = ({ level = 'easy', onBackToMenu }) => {
@@ -214,7 +221,7 @@ const GameScreen = ({ level = 'easy', onBackToMenu }) => {
   const [playError] = useSound(errorSoundUrl);
 
   // Add floating emojis
-  const emojis = ["🎈", "⭐", "✨", "🎯", "🎨", "🌈"];
+  const emojis = ["🎈", "⭐", "✨", "🎯", "🎨", "🌈", "🎪", "🎭", "🎡"];
 
   const generateBalloons = () => {
     const count = level === 'easy' ? 5 : level === 'medium' ? 8 : 10;
@@ -278,36 +285,37 @@ const GameScreen = ({ level = 'easy', onBackToMenu }) => {
     <GameWrapper>
       <Background />
       
-      {/* Add floating emojis */}
+      {/* Floating emojis in background */}
       {emojis.map((emoji, index) => (
         <FloatingEmoji
           key={index}
           initial={{
             x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
+            y: window.innerHeight + 100,
             rotate: 0,
+            scale: 1,
           }}
           animate={{
             x: [
               Math.random() * window.innerWidth,
               Math.random() * window.innerWidth,
             ],
-            y: [
-              Math.random() * window.innerHeight,
-              Math.random() * window.innerHeight,
-            ],
-            rotate: 360,
+            y: [-100, window.innerHeight + 100],
+            rotate: [0, 360],
+            scale: [1, 1.2, 1],
           }}
           transition={{
-            duration: Math.random() * 20 + 10,
+            duration: Math.random() * 10 + 15,
             repeat: Infinity,
             ease: "linear",
+            times: [0, 1],
           }}
         >
           {emoji}
         </FloatingEmoji>
       ))}
 
+      {/* UI Elements */}
       <BackButton
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -315,14 +323,23 @@ const GameScreen = ({ level = 'easy', onBackToMenu }) => {
       >
         ← Back
       </BackButton>
+      
+      <div style={{ display: 'flex', gap: '20px', position: 'fixed', top: '20px', right: '20px' }}>
+        <Timer 
+          initial={{ x: 100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          isLow={timeLeft <= 10}
+        >
+          {timeLeft}s
+        </Timer>
 
-      <Timer 
-        initial={{ x: 100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        isLow={timeLeft <= 10}
-      >
-        {timeLeft}s
-      </Timer>
+        <Score
+          initial={{ x: 100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+        >
+          Score: {score}
+        </Score>
+      </div>
 
       <TargetNumber
         initial={{ y: -50, opacity: 0 }}
@@ -330,14 +347,8 @@ const GameScreen = ({ level = 'easy', onBackToMenu }) => {
       >
         Find: {targetNumber}
       </TargetNumber>
-
-      <Score
-        initial={{ x: 100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-      >
-        Score: {score}
-      </Score>
       
+      {/* Balloons */}
       {balloons.map((number, index) => (
         <Balloon
           key={`${number}-${index}`}
@@ -347,6 +358,7 @@ const GameScreen = ({ level = 'easy', onBackToMenu }) => {
         />
       ))}
 
+      {/* Celebration Effects */}
       {showCelebration && (
         <CelebrationEffect
           initial={{ opacity: 0 }}
@@ -354,7 +366,7 @@ const GameScreen = ({ level = 'easy', onBackToMenu }) => {
           exit={{ opacity: 0 }}
         />
       )}
-
+      
       <AnimatePresence>
         {gameOver && (
           <GameOverModal
