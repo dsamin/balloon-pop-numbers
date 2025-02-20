@@ -206,10 +206,6 @@ body {
   filter: blur(5px);
 }
 
-.stars {
-  display: none;
-}
-
 @media (max-width: 768px) {
   .level-buttons button {
     padding: 20px 40px;
