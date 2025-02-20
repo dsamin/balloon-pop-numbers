@@ -289,15 +289,16 @@ const GameScreen = ({ level = 'easy', onBackToMenu }) => {
   const emojis = ["🎈", "⭐", "✨", "🎯", "🎨", "🌈", "🎪", "🎭", "🎡"];
 
   const generateBalloons = () => {
-    const count = level === 'easy' ? 5 : level === 'medium' ? 8 : 10;
-    const maxNumber = level === 'easy' ? 5 : level === 'medium' ? 10 : 20;
     const isMobile = window.innerWidth <= 768;
     
-    // Reduce count for mobile if needed
-    const mobileCount = isMobile ? Math.min(count, 6) : count;
+    // Adjust count based on screen size
+    const baseCount = level === 'easy' ? 5 : level === 'medium' ? 8 : 10;
+    const count = isMobile ? Math.min(baseCount, 5) : baseCount; // Limit to 5 balloons on mobile
+    
+    const maxNumber = level === 'easy' ? 5 : level === 'medium' ? 10 : 20;
     
     const numbers = new Set();
-    while (numbers.size < mobileCount) {
+    while (numbers.size < count) {
       numbers.add(Math.floor(Math.random() * maxNumber) + 1);
     }
     

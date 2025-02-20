@@ -87,23 +87,23 @@ const BalloonWrapper = styled(motion.div)`
     height: 65px;
 
     .number {
-      font-size: 1.8rem;
+      font-size: 1.5rem;
     }
 
     .string {
-      height: 15px;
-      bottom: -15px;
+      height: 12px;
+      bottom: -12px;
     }
 
     .knot {
-      bottom: -20px;
-      width: 6px;
-      height: 6px;
+      bottom: -15px;
+      width: 4px;
+      height: 4px;
     }
 
     .shine {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
     }
   }
 `;
@@ -111,19 +111,29 @@ const BalloonWrapper = styled(motion.div)`
 const Balloon = ({ number, onPop, isTarget }) => {
   const [isPopped, setIsPopped] = useState(false);
   
-  // Adjust positioning based on screen size
+  // Improved positioning logic for mobile
   const getRandomPosition = () => {
     const isMobile = window.innerWidth <= 768;
-    const padding = isMobile ? 60 : 100;
-    const minDistance = isMobile ? 70 : 100; // Minimum distance between balloons
+    const balloonSize = isMobile ? 50 : 85; // Width of balloon
+    const padding = balloonSize / 2;
     
-    let x = Math.random() * (window.innerWidth - padding);
-    let y = window.innerHeight + padding;
+    // Calculate safe zones for balloon placement
+    const safeWidth = window.innerWidth - (balloonSize * 2);
+    const safeHeight = window.innerHeight - balloonSize;
     
-    // Ensure x is not too close to edges
+    // Ensure balloons are spaced out horizontally
+    const columns = isMobile ? 3 : 5; // Number of columns for balloon distribution
+    const columnWidth = safeWidth / columns;
+    const column = Math.floor(Math.random() * columns);
+    
+    // Calculate x position within the column
+    let x = (column * columnWidth) + (columnWidth / 2) + padding;
+    let y = safeHeight + balloonSize;
+
+    // Ensure x is within screen bounds
     x = Math.max(padding, Math.min(x, window.innerWidth - padding));
     
-    return { x, y, minDistance };
+    return { x, y };
   };
 
   const [position] = useState(getRandomPosition());
@@ -148,11 +158,11 @@ const Balloon = ({ number, onPop, isTarget }) => {
           stringRotation={stringRotation}
           initial={{ y: position.y, x: position.x, rotate: 0 }}
           animate={{ 
-            y: -200,
-            x: position.x + Math.sin(Date.now() / 1000) * (window.innerWidth <= 768 ? 30 : 50),
-            rotate: Math.sin(Date.now() / 1000) * (window.innerWidth <= 768 ? 10 : 15),
+            y: window.innerWidth <= 768 ? 100 : -200, // Keep balloons lower on mobile
+            x: position.x + Math.sin(Date.now() / 1000) * (window.innerWidth <= 768 ? 20 : 50), // Reduce movement on mobile
+            rotate: Math.sin(Date.now() / 1000) * (window.innerWidth <= 768 ? 5 : 15),
             transition: { 
-              duration: window.innerWidth <= 768 ? 6 : 8,
+              duration: window.innerWidth <= 768 ? 5 : 8,
               ease: "linear",
             }
           }}
