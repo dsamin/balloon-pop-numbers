@@ -33,14 +33,71 @@ const Score = styled(motion.div)`
   box-shadow: 
     0 4px 15px rgba(0,0,0,0.1),
     inset 0 0 0 1px rgba(255,255,255,0.2);
+  z-index: 100;
 `;
 
-const TargetNumber = styled(motion.div)`
+const BackButton = styled(motion.button)`
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  padding: 15px 30px;
+  font-size: 24px;
+  border: none;
+  border-radius: 25px;
+  background: linear-gradient(145deg, #FF6B6B, #ff8585);
+  color: white;
+  cursor: pointer;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 
+    0 8px 0 #FF4F4F,
+    0 15px 20px rgba(0,0,0,0.15);
+  transition: all 0.2s;
+  z-index: 100;
+
+  &:active {
+    transform: translateY(4px);
+    box-shadow: 
+      0 4px 0 #FF4F4F,
+      0 8px 10px rgba(0,0,0,0.15);
+  }
+`;
+
+const Timer = styled(motion.div)`
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 40px;
+  font-size: 36px;
+  color: white;
+  background: rgba(255,255,255,0.2);
+  padding: 15px 40px;
+  border-radius: 25px;
+  backdrop-filter: blur(8px);
+  box-shadow: 
+    0 4px 15px rgba(0,0,0,0.1),
+    inset 0 0 0 1px rgba(255,255,255,0.2);
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  z-index: 100;
+
+  ${props => props.isLow && `
+    color: #FF6B6B;
+    animation: pulse 1s infinite;
+  `}
+
+  @keyframes pulse {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.05); }
+  }
+`;
+
+const TargetNumber = styled(motion.div)`
+  position: fixed;
+  top: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 32px;
   color: white;
   background: rgba(255,255,255,0.2);
   padding: 15px 40px;
@@ -75,11 +132,38 @@ const CelebrationEffect = styled(motion.div)`
   }
 `;
 
+const GameOverModal = styled(motion.div)`
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255,255,255,0.95);
+  padding: 40px 60px;
+  border-radius: 30px;
+  text-align: center;
+  z-index: 1000;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+
+  h2 {
+    font-size: 36px;
+    color: #FF6B6B;
+    margin-bottom: 20px;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+  }
+
+  p {
+    font-size: 24px;
+    color: #666;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+  }
+`;
+
 const GameScreen = ({ level = 'easy', onBackToMenu }) => {
   const [targetNumber, setTargetNumber] = useState(null);
   const [balloons, setBalloons] = useState([]);
   const [score, setScore] = useState(0);
-  const [stars, setStars] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [gameOver, setGameOver] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
 
   const [playPop] = useSound(popSoundUrl);
@@ -109,19 +193,36 @@ const GameScreen = ({ level = 'easy', onBackToMenu }) => {
       playPop();
       playSuccess();
       setScore(score + 1);
-      setStars(prev => {
-        const newStars = prev + 1;
-        if (newStars % 5 === 0) {
-          setShowCelebration(true);
-          setTimeout(() => setShowCelebration(false), 2000);
-        }
-        return newStars;
-      });
+      setShowCelebration(true);
+      setTimeout(() => setShowCelebration(false), 2000);
       startNewRound();
     } else {
       playError();
     }
   };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          setGameOver(true);
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if (gameOver) {
+      setTimeout(() => {
+        onBackToMenu();
+      }, 3000);
+    }
+  }, [gameOver]);
 
   useEffect(() => {
     startNewRound();
@@ -130,40 +231,36 @@ const GameScreen = ({ level = 'easy', onBackToMenu }) => {
   return (
     <GameWrapper>
       <Background />
+      
+      <BackButton
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={onBackToMenu}
+      >
+        ← Back
+      </BackButton>
+
+      <Timer 
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        isLow={timeLeft <= 10}
+      >
+        {timeLeft}s
+      </Timer>
+
+      <TargetNumber
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+      >
+        Find: {targetNumber}
+      </TargetNumber>
+
       <Score
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
       >
         Score: {score}
       </Score>
-      <TargetNumber
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-      >
-        Find: {targetNumber}
-      </TargetNumber>
-      
-      <motion.button
-        className="back-button"
-        onClick={onBackToMenu}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-      >
-        ← Back
-      </motion.button>
-
-      <div className="stars">
-        {Array.from({ length: Math.min(5, stars % 5 + 1) }).map((_, i) => (
-          <motion.span
-            key={i}
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="star"
-          >
-            ⭐
-          </motion.span>
-        ))}
-      </div>
       
       {balloons.map((number, index) => (
         <Balloon
@@ -181,6 +278,19 @@ const GameScreen = ({ level = 'easy', onBackToMenu }) => {
           exit={{ opacity: 0 }}
         />
       )}
+
+      <AnimatePresence>
+        {gameOver && (
+          <GameOverModal
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0 }}
+          >
+            <h2>Time's Up! 🎈</h2>
+            <p>Final Score: {score}</p>
+          </GameOverModal>
+        )}
+      </AnimatePresence>
     </GameWrapper>
   );
 };
