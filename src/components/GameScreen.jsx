@@ -80,7 +80,7 @@ const BackButton = styled(motion.button)`
 const Timer = styled(motion.div)`
   position: fixed;
   top: 20px;
-  right: 200px;
+  right: 250px;
   font-size: 36px;
   color: white;
   background: linear-gradient(145deg, #FF6B6B, #FF9A8B);
@@ -324,7 +324,14 @@ const GameScreen = ({ level = 'easy', onBackToMenu }) => {
         ← Back
       </BackButton>
       
-      <div style={{ display: 'flex', gap: '20px', position: 'fixed', top: '20px', right: '20px' }}>
+      <div style={{ 
+        display: 'flex', 
+        gap: '30px', 
+        position: 'fixed', 
+        top: '20px', 
+        right: '20px',
+        alignItems: 'center'
+      }}>
         <Timer 
           initial={{ x: 100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
