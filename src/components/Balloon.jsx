@@ -23,6 +23,7 @@ const BalloonWrapper = styled(motion.div)`
   cursor: pointer;
   user-select: none;
   touch-action: none;
+  z-index: 2;
 
   &::before {
     content: '';
@@ -82,8 +83,8 @@ const BalloonWrapper = styled(motion.div)`
   }
 
   @media (max-width: 768px) {
-    width: 60px;
-    height: 75px;
+    width: 50px;
+    height: 65px;
 
     .number {
       font-size: 1.8rem;
@@ -109,10 +110,23 @@ const BalloonWrapper = styled(motion.div)`
 
 const Balloon = ({ number, onPop, isTarget }) => {
   const [isPopped, setIsPopped] = useState(false);
-  const [position] = useState({
-    x: Math.random() * (window.innerWidth - (window.innerWidth <= 768 ? 60 : 100)),
-    y: window.innerHeight + (window.innerWidth <= 768 ? 60 : 100)
-  });
+  
+  // Adjust positioning based on screen size
+  const getRandomPosition = () => {
+    const isMobile = window.innerWidth <= 768;
+    const padding = isMobile ? 60 : 100;
+    const minDistance = isMobile ? 70 : 100; // Minimum distance between balloons
+    
+    let x = Math.random() * (window.innerWidth - padding);
+    let y = window.innerHeight + padding;
+    
+    // Ensure x is not too close to edges
+    x = Math.max(padding, Math.min(x, window.innerWidth - padding));
+    
+    return { x, y, minDistance };
+  };
+
+  const [position] = useState(getRandomPosition());
   const [stringRotation] = useState(Math.random() * 10 - 5);
   
   const randomColor = colors[Math.floor(Math.random() * colors.length)];
@@ -135,10 +149,10 @@ const Balloon = ({ number, onPop, isTarget }) => {
           initial={{ y: position.y, x: position.x, rotate: 0 }}
           animate={{ 
             y: -200,
-            x: position.x + Math.sin(Date.now() / 1000) * 50,
-            rotate: Math.sin(Date.now() / 1000) * 15,
+            x: position.x + Math.sin(Date.now() / 1000) * (window.innerWidth <= 768 ? 30 : 50),
+            rotate: Math.sin(Date.now() / 1000) * (window.innerWidth <= 768 ? 10 : 15),
             transition: { 
-              duration: 8, 
+              duration: window.innerWidth <= 768 ? 6 : 8,
               ease: "linear",
             }
           }}

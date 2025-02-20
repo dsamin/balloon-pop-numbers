@@ -50,9 +50,15 @@ const Score = styled(motion.div)`
   }
 
   @media (max-width: 768px) {
-    top: auto;
+    position: fixed;
     bottom: 20px;
     right: 20px;
+    top: auto;
+    font-size: 18px;
+    padding: 8px 16px;
+    box-shadow: 
+      0 4px 0 #FFC91F,
+      0 8px 15px rgba(0,0,0,0.15);
   }
 `;
 
@@ -120,12 +126,16 @@ const Timer = styled(motion.div)`
   }
 
   @media (max-width: 768px) {
-    position: relative;
-    top: auto;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
     right: auto;
-    padding: 10px 20px;
-    font-size: 20px;
-    width: auto;
+    top: auto;
+    font-size: 18px;
+    padding: 8px 16px;
+    box-shadow: 
+      0 4px 0 #FF4F4F,
+      0 8px 15px rgba(0,0,0,0.15);
   }
 
   ${props => props.isLow && `
@@ -164,11 +174,12 @@ const TargetNumber = styled(motion.div)`
   white-space: nowrap;
 
   @media (max-width: 768px) {
-    top: 80px;
-    padding: 12px 24px;
-    font-size: 24px;
-    width: auto;
-    max-width: 90%;
+    top: 70px;
+    padding: 8px 20px;
+    font-size: 20px;
+    box-shadow: 
+      0 4px 0 #3AA7A0,
+      0 8px 15px rgba(0,0,0,0.15);
   }
 
   &::before {
@@ -280,9 +291,13 @@ const GameScreen = ({ level = 'easy', onBackToMenu }) => {
   const generateBalloons = () => {
     const count = level === 'easy' ? 5 : level === 'medium' ? 8 : 10;
     const maxNumber = level === 'easy' ? 5 : level === 'medium' ? 10 : 20;
+    const isMobile = window.innerWidth <= 768;
+    
+    // Reduce count for mobile if needed
+    const mobileCount = isMobile ? Math.min(count, 6) : count;
     
     const numbers = new Set();
-    while (numbers.size < count) {
+    while (numbers.size < mobileCount) {
       numbers.add(Math.floor(Math.random() * maxNumber) + 1);
     }
     
@@ -378,31 +393,20 @@ const GameScreen = ({ level = 'easy', onBackToMenu }) => {
         ← Back
       </BackButton>
       
-      <div style={{ 
-        display: 'flex', 
-        flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
-        gap: '15px', 
-        position: 'fixed', 
-        bottom: window.innerWidth <= 768 ? '20px' : 'auto',
-        top: window.innerWidth <= 768 ? 'auto' : '20px',
-        right: '20px',
-        alignItems: 'center'
-      }}>
-        <Timer 
-          initial={{ x: 100, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          isLow={timeLeft <= 10}
-        >
-          {timeLeft}s
-        </Timer>
+      <Timer 
+        initial={{ x: 100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        isLow={timeLeft <= 10}
+      >
+        {timeLeft}s
+      </Timer>
 
-        <Score
-          initial={{ x: 100, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-        >
-          Score: {score}
-        </Score>
-      </div>
+      <Score
+        initial={{ x: 100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+      >
+        Score: {score}
+      </Score>
 
       <TargetNumber
         initial={{ y: -50, opacity: 0 }}
