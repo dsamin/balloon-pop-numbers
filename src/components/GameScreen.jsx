@@ -421,6 +421,8 @@ const GameScreen = ({ level = 'easy', onBackToMenu }) => {
         <Balloon
           key={`${number}-${index}`}
           number={number}
+          index={index}
+          totalBalloons={balloons.length}
           onPop={handlePop}
           isTarget={number === targetNumber}
         />

@@ -108,32 +108,41 @@ const BalloonWrapper = styled(motion.div)`
   }
 `;
 
-const Balloon = ({ number, onPop, isTarget }) => {
+const Balloon = ({ number, onPop, isTarget, index, totalBalloons }) => {
   const [isPopped, setIsPopped] = useState(false);
   
-  // Improved positioning logic for mobile
+  // Improved positioning logic with better spacing
   const getRandomPosition = () => {
     const isMobile = window.innerWidth <= 768;
-    const balloonSize = isMobile ? 50 : 85; // Width of balloon
-    const padding = balloonSize / 2;
+    const balloonSize = isMobile ? 50 : 85;
+    const padding = balloonSize;
     
-    // Calculate safe zones for balloon placement
-    const safeWidth = window.innerWidth - (balloonSize * 2);
+    // Calculate available space
+    const availableWidth = window.innerWidth - (padding * 2);
     const safeHeight = window.innerHeight - balloonSize;
     
-    // Ensure balloons are spaced out horizontally
-    const columns = isMobile ? 3 : 5; // Number of columns for balloon distribution
-    const columnWidth = safeWidth / columns;
-    const column = Math.floor(Math.random() * columns);
+    // Calculate section width based on total balloons
+    const sectionWidth = availableWidth / totalBalloons;
     
-    // Calculate x position within the column
-    let x = (column * columnWidth) + (columnWidth / 2) + padding;
-    let y = safeHeight + balloonSize;
-
-    // Ensure x is within screen bounds
+    // Position balloon within its section with some randomness
+    const minX = (sectionWidth * index) + padding;
+    const maxX = minX + sectionWidth - balloonSize;
+    
+    // Add some controlled randomness within the section
+    const randomOffset = (Math.random() - 0.5) * (sectionWidth * 0.5);
+    let x = minX + (sectionWidth / 2) + randomOffset;
+    
+    // Ensure x stays within screen bounds
     x = Math.max(padding, Math.min(x, window.innerWidth - padding));
     
-    return { x, y };
+    // Stagger vertical positions
+    const staggeredY = safeHeight + (index % 2 === 0 ? 0 : balloonSize);
+    
+    return { 
+      x,
+      y: staggeredY,
+      sectionWidth // Pass this for animation boundaries
+    };
   };
 
   const [position] = useState(getRandomPosition());
@@ -158,9 +167,10 @@ const Balloon = ({ number, onPop, isTarget }) => {
           stringRotation={stringRotation}
           initial={{ y: position.y, x: position.x, rotate: 0 }}
           animate={{ 
-            y: window.innerWidth <= 768 ? 100 : -200, // Keep balloons lower on mobile
-            x: position.x + Math.sin(Date.now() / 1000) * (window.innerWidth <= 768 ? 20 : 50), // Reduce movement on mobile
-            rotate: Math.sin(Date.now() / 1000) * (window.innerWidth <= 768 ? 5 : 15),
+            y: window.innerWidth <= 768 ? 100 : -200,
+            // Constrain horizontal movement within balloon's section
+            x: position.x + Math.sin(Date.now() / 1000 + index) * (position.sectionWidth * 0.2),
+            rotate: Math.sin(Date.now() / 1000 + index) * (window.innerWidth <= 768 ? 5 : 15),
             transition: { 
               duration: window.innerWidth <= 768 ? 5 : 8,
               ease: "linear",
