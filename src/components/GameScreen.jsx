@@ -26,14 +26,24 @@ const Score = styled(motion.div)`
   right: 20px;
   font-size: 32px;
   color: white;
-  background: rgba(255,255,255,0.2);
+  background: linear-gradient(145deg, #FFD93D, #FFE869);
   padding: 15px 30px;
   border-radius: 25px;
   backdrop-filter: blur(8px);
   box-shadow: 
-    0 4px 15px rgba(0,0,0,0.1),
-    inset 0 0 0 1px rgba(255,255,255,0.2);
+    0 8px 0 #FFC91F,
+    0 15px 20px rgba(0,0,0,0.15);
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
   z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  &::before {
+    content: '🏆';
+    font-size: 24px;
+  }
 `;
 
 const BackButton = styled(motion.button)`
@@ -66,11 +76,10 @@ const BackButton = styled(motion.button)`
 const Timer = styled(motion.div)`
   position: fixed;
   top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 150px;
   font-size: 36px;
   color: white;
-  background: rgba(255,255,255,0.2);
+  background: linear-gradient(145deg, #FF6B6B, #FF9A8B);
   padding: 15px 40px;
   border-radius: 25px;
   backdrop-filter: blur(8px);
@@ -80,32 +89,56 @@ const Timer = styled(motion.div)`
   font-family: 'Comic Sans MS', cursive, sans-serif;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
   z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 
   ${props => props.isLow && `
-    color: #FF6B6B;
-    animation: pulse 1s infinite;
+    color: #FFD93D;
+    animation: timerPulse 1s infinite;
+    background: linear-gradient(145deg, #FF4F4F, #FF6B6B);
   `}
 
-  @keyframes pulse {
-    0%, 100% { transform: translateX(-50%) scale(1); }
-    50% { transform: translateX(-50%) scale(1.05); }
+  @keyframes timerPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  &::before {
+    content: '⏰';
+    font-size: 24px;
   }
 `;
 
 const TargetNumber = styled(motion.div)`
   position: fixed;
-  top: 90px;
+  top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 32px;
+  font-size: 36px;
   color: white;
-  background: rgba(255,255,255,0.2);
-  padding: 15px 40px;
+  background: linear-gradient(145deg, #4ECDC4, #45E3FF);
+  padding: 20px 40px;
   border-radius: 25px;
   backdrop-filter: blur(8px);
   box-shadow: 
-    0 4px 15px rgba(0,0,0,0.1),
-    inset 0 0 0 1px rgba(255,255,255,0.2);
+    0 8px 0 #3AA7A0,
+    0 15px 20px rgba(0,0,0,0.15);
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  &::before {
+    content: '🎯';
+    font-size: 30px;
+  }
+
+  &:hover {
+    transform: translateX(-50%) scale(1.05);
+  }
 `;
 
 const CelebrationEffect = styled(motion.div)`
@@ -158,6 +191,16 @@ const GameOverModal = styled(motion.div)`
   }
 `;
 
+// Add some fun floating elements
+const FloatingEmoji = styled(motion.div)`
+  position: fixed;
+  font-size: 30px;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+  opacity: 0.5;
+`;
+
 const GameScreen = ({ level = 'easy', onBackToMenu }) => {
   const [targetNumber, setTargetNumber] = useState(null);
   const [balloons, setBalloons] = useState([]);
@@ -169,6 +212,9 @@ const GameScreen = ({ level = 'easy', onBackToMenu }) => {
   const [playPop] = useSound(popSoundUrl);
   const [playSuccess] = useSound(successSoundUrl);
   const [playError] = useSound(errorSoundUrl);
+
+  // Add floating emojis
+  const emojis = ["🎈", "⭐", "✨", "🎯", "🎨", "🌈"];
 
   const generateBalloons = () => {
     const count = level === 'easy' ? 5 : level === 'medium' ? 8 : 10;
@@ -232,6 +278,36 @@ const GameScreen = ({ level = 'easy', onBackToMenu }) => {
     <GameWrapper>
       <Background />
       
+      {/* Add floating emojis */}
+      {emojis.map((emoji, index) => (
+        <FloatingEmoji
+          key={index}
+          initial={{
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            rotate: 0,
+          }}
+          animate={{
+            x: [
+              Math.random() * window.innerWidth,
+              Math.random() * window.innerWidth,
+            ],
+            y: [
+              Math.random() * window.innerHeight,
+              Math.random() * window.innerHeight,
+            ],
+            rotate: 360,
+          }}
+          transition={{
+            duration: Math.random() * 20 + 10,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        >
+          {emoji}
+        </FloatingEmoji>
+      ))}
+
       <BackButton
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -241,8 +317,8 @@ const GameScreen = ({ level = 'easy', onBackToMenu }) => {
       </BackButton>
 
       <Timer 
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
+        initial={{ x: 100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
         isLow={timeLeft <= 10}
       >
         {timeLeft}s
