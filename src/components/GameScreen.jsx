@@ -76,8 +76,13 @@ const BackButton = styled(motion.button)`
   z-index: 100;
 
   @media (max-width: 768px) {
-    padding: 10px 20px;
-    font-size: 18px;
+    top: 20px;
+    left: 20px;
+    padding: 8px 16px;
+    font-size: 16px;
+    box-shadow: 
+      0 4px 0 #FF4F4F,
+      0 8px 10px rgba(0,0,0,0.15);
   }
 
   &:active {
@@ -115,10 +120,12 @@ const Timer = styled(motion.div)`
   }
 
   @media (max-width: 768px) {
+    position: relative;
     top: auto;
-    bottom: 20px;
     right: auto;
-    left: 20px;
+    padding: 10px 20px;
+    font-size: 20px;
+    width: auto;
   }
 
   ${props => props.isLow && `
@@ -154,15 +161,19 @@ const TargetNumber = styled(motion.div)`
   display: flex;
   align-items: center;
   gap: 10px;
+  white-space: nowrap;
+
+  @media (max-width: 768px) {
+    top: 80px;
+    padding: 12px 24px;
+    font-size: 24px;
+    width: auto;
+    max-width: 90%;
+  }
 
   &::before {
     content: '🎯';
     font-size: clamp(20px, 4vw, 30px);
-  }
-
-  @media (max-width: 768px) {
-    width: fit-content;
-    padding: 10px 20px;
   }
 
   &:hover {
@@ -219,6 +230,20 @@ const GameOverModal = styled(motion.div)`
     font-size: clamp(18px, 4vw, 24px);
     color: #666;
     font-family: 'Comic Sans MS', cursive, sans-serif;
+  }
+
+  @media (max-width: 768px) {
+    width: 85%;
+    padding: 20px;
+    
+    h2 {
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+    
+    p {
+      font-size: 20px;
+    }
   }
 `;
 
@@ -355,9 +380,11 @@ const GameScreen = ({ level = 'easy', onBackToMenu }) => {
       
       <div style={{ 
         display: 'flex', 
-        gap: '30px', 
+        flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
+        gap: '15px', 
         position: 'fixed', 
-        top: '20px', 
+        bottom: window.innerWidth <= 768 ? '20px' : 'auto',
+        top: window.innerWidth <= 768 ? 'auto' : '20px',
         right: '20px',
         alignItems: 'center'
       }}>

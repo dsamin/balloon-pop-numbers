@@ -82,8 +82,27 @@ const BalloonWrapper = styled(motion.div)`
   }
 
   @media (max-width: 768px) {
+    width: 60px;
+    height: 75px;
+
+    .number {
+      font-size: 1.8rem;
+    }
+
     .string {
-      height: 20px;
+      height: 15px;
+      bottom: -15px;
+    }
+
+    .knot {
+      bottom: -20px;
+      width: 6px;
+      height: 6px;
+    }
+
+    .shine {
+      width: 10px;
+      height: 10px;
     }
   }
 `;
@@ -91,8 +110,8 @@ const BalloonWrapper = styled(motion.div)`
 const Balloon = ({ number, onPop, isTarget }) => {
   const [isPopped, setIsPopped] = useState(false);
   const [position] = useState({
-    x: Math.random() * (window.innerWidth - 100),
-    y: window.innerHeight + 100
+    x: Math.random() * (window.innerWidth - (window.innerWidth <= 768 ? 60 : 100)),
+    y: window.innerHeight + (window.innerWidth <= 768 ? 60 : 100)
   });
   const [stringRotation] = useState(Math.random() * 10 - 5);
   
@@ -100,6 +119,7 @@ const Balloon = ({ number, onPop, isTarget }) => {
 
   const handleInteraction = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!isPopped) {
       setIsPopped(true);
       setTimeout(() => onPop(number), 300);
@@ -129,6 +149,8 @@ const Balloon = ({ number, onPop, isTarget }) => {
           }}
           onClick={handleInteraction}
           onTouchStart={handleInteraction}
+          onTouchEnd={(e) => e.preventDefault()}
+          style={{ touchAction: 'none' }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
